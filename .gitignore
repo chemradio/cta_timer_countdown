@@ -1,0 +1,4 @@
+venv/
+DS_Store
+program_starts.json
+*.pyc
