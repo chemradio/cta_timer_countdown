@@ -1,6 +1,7 @@
 import time
 
 from display_drivers.abstract_display import PrintableDigitDisplay
+from helpers.get_now_tz import construct_now_datetime
 from helpers.time_formatter import format_time
 from helpers.track_time import track_time
 
@@ -8,7 +9,7 @@ from helpers.track_time import track_time
 def print_time_to_display(db: list[dict], display: PrintableDigitDisplay) -> None:
     while True:
         # construct closest time object (optional, may be None)
-        timer_status, timedelta_obj = track_time(db=db)
+        timer_status, timedelta_obj = track_time(construct_now_datetime(), db=db)
         print(f"{timer_status=}, {timedelta_obj=}")
 
         # format time to display
