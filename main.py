@@ -1,18 +1,20 @@
-import datetime
-from pprint import pprint
-
 from helpers.db_parser import parse_database
+from helpers.track_time import track_time
 
-print(dummy_datetime)
-# db = parse_database("./program_starts.json")
-# pprint(db)
 
-# current_datetime = datetime.datetime.utcnow() + datetime.timedelta(hours=6)
+def main():
+    # parse database
+    db = parse_database("./program_starts.json")
 
-# # for program in db:
-# #     if current_datetime.weekday not in program["weekdays"]:
-# #         continue
+    # construct closest time object (optional, may be None)
+    time_obj = track_time(db=db)
 
-# x = current_datetime.time()
-# y = datetime.time(hour=23, minute=59)
-# print(x > y)
+    # format time to display
+    ...
+
+    # write string to display
+    ...
+
+
+if __name__ == "__main__":
+    main()

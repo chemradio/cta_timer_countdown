@@ -8,33 +8,31 @@ def parse_database(db_path: Path | str) -> list[dict]:
         database: list[dict] = json.load(f)
 
     for program in database:
-        if not program["start"]:
+        if not program.get("start"):
             raise ValueError(f"Program {program.get('name')} has no start time.")
             # raw_data.remove(program)
 
         program_start = datetime.time.fromisoformat(program["start"])
         program["start"] = program_start
 
-        if not program["duration"] and not program["end"]:
+        if not program.get("duration") and not program.get("end"):
             raise ValueError(
                 f"Can't determine end time for program {program.get('name')}."
             )
             # raw_data.remove(program)
 
-        if program["duration"]:
-            datetime.datetime.combine(
+        if program.get("duration"):
+            start_datetime = datetime.datetime.combine(
                 datetime.datetime(year=2023, month=1, day=1), program_start
             )
 
             duration = program.pop("duration")
-            duration_hours, duration_minutes, duration_seconds = parse_iso(duration)
-            program_end = datetime.time(
-                hour=program_start.hour + duration_hours,
-                minute=program_start.minute + duration_minutes,
-                second=program_start.second + duration_seconds,
-            )
+            duration_delta = parse_iso_to_delta(duration)
+            program_end_datetime = start_datetime + duration_delta
 
-        elif program["end"]:
+            program_end = program_end_datetime.time()
+
+        elif program.get("end"):
             program_end = datetime.time.fromisoformat(program["end"])
             if program_end <= program_start:
                 raise ValueError(
@@ -45,7 +43,7 @@ def parse_database(db_path: Path | str) -> list[dict]:
     return database
 
 
-def parse_iso(iso_time: str) -> tuple[int]:
+def parse_iso_to_delta(iso_time: str) -> datetime.timedelta:
     hours, minutes, seconds = 0, 0, 0
     time_array = iso_time.split(":")
     if len(time_array) < 2:
@@ -55,4 +53,4 @@ def parse_iso(iso_time: str) -> tuple[int]:
     if len(time_array) > 2:
         hours = int(time_array[-3])
 
-    return hours, minutes, seconds
+    return datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
