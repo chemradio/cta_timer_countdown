@@ -1,25 +1,47 @@
 import datetime
 
-from helpers.get_now_tz import construct_now_datetime
+from enums.timer_status import TimerStatus
+from helpers.get_now_tz import construct_now_datetime, get_target_tz
 
 
 def track_time(
     current_datetime: datetime.datetime = construct_now_datetime(),
     db: list[dict] = list(),
-) -> datetime.time | None:
+) -> tuple[TimerStatus, datetime.timedelta | None]:
+    print(current_datetime)
     if not db:
-        return None
+        return TimerStatus.IDLE, None
 
-    # check if today any programs going on air
-    weekdays_with_programs = list()
+    # weekdays_with_programs = list()
     for program in db:
-        weekdays_with_programs.extend(program["weekdays"])
-    weekdays_with_programs = set(weekdays_with_programs)
+        if current_datetime.weekday() not in program["weekdays"]:
+            continue
 
-    if current_datetime.weekday not in weekdays_with_programs:
-        return None
+        current_time = current_datetime.time()
 
-    # find time / most logic
-    ...
+        if current_time >= program["end"]:
+            if (current_datetime.weekday() + 1) in program["weekdays"]:
+                tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+                tomorrow_start_datetime = datetime.datetime.combine(
+                    tomorrow, program["start"], get_target_tz()
+                )
+                diff = tomorrow_start_datetime - current_datetime
+                return TimerStatus.COUNTDOWN_TOMORROW, diff
+            else:
+                continue
 
-    return datetime.time(...)
+        if current_time < program["start"]:
+            program_start_datetime = datetime.datetime.combine(
+                datetime.date.today(), program["start"], get_target_tz()
+            )
+            diff = program_start_datetime - current_datetime
+            return TimerStatus.COUNTDOWN, diff
+
+        elif current_time >= program["start"]:
+            program_end_datetime = datetime.datetime.combine(
+                datetime.date.today(), program["end"], get_target_tz()
+            )
+            diff = program_end_datetime - current_datetime
+            return TimerStatus.ONAIR, diff
+
+    return TimerStatus.IDLE, None

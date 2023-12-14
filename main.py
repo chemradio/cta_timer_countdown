@@ -7,7 +7,7 @@ def main():
     db = parse_database("./program_starts.json")
 
     # construct closest time object (optional, may be None)
-    time_obj = track_time(db=db)
+    timer_status, timedelta_obj = track_time(db=db)
 
     # format time to display
     ...
