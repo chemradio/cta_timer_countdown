@@ -4,6 +4,9 @@ from time import sleep, time
 import wiringpi
 from wiringpi import GPIO
 
+from display_drivers.abstract_display import PrintableDigitDisplay
+from enums.digit_display import DigitDisplay
+
 TM1637_CMD1 = 64  # 0x40 data command
 TM1637_CMD2 = 192  # 0xC0 address command
 TM1637_CMD3 = 128  # 0x80 display control command
@@ -17,13 +20,13 @@ _SEGMENTS = bytearray(
 )
 
 
-class TM1637(object):
+class TM1637(PrintableDigitDisplay):
     """Library for quad 7-segment LED modules based on the TM1637 LED driver."""
 
     def __init__(self, clk, dio, brightness=7, power_pin: int = 9):
         self.clk = clk
         self.dio = dio
-
+        self.display_type = DigitDisplay.SIX_DOTTED
         if not 0 <= brightness <= 7:
             raise ValueError("Brightness out of range")
         self._brightness = brightness
@@ -133,45 +136,32 @@ class TM1637(object):
             return _SEGMENTS[o - 48]  # 0-9
         raise ValueError("Character out of range: {:d} '{:s}'".format(o, char))
 
-    def print_to_display(self, input: str):
+    def print_to_display(self, input: str) -> None:
         encoded_string = self.encode_string(input)
         self.write(encoded_string)
 
 
-def display_current_time(tm1637):
-    utc_offset = timedelta(hours=6)
+# def display_current_time(tm1637):
+#     utc_offset = timedelta(hours=6)
 
-    while True:
-        # Get the current UTC time
-        current_time_utc = datetime.utcnow().time()
+#     while True:
+#         # Get the current UTC time
+#         current_time_utc = datetime.utcnow().time()
 
-        # Add the UTC offset to get the desired time zone (UTC+6)
-        current_time_desired_tz = (
-            datetime.combine(datetime.today(), current_time_utc) + utc_offset
-        )
+#         # Add the UTC offset to get the desired time zone (UTC+6)
+#         current_time_desired_tz = (
+#             datetime.combine(datetime.today(), current_time_utc) + utc_offset
+#         )
 
-        # Format the time as a string (HHMMSS)
-        time_str = "{:02d}.{:02d}.{:02d}".format(
-            current_time_desired_tz.hour,
-            current_time_desired_tz.minute,
-            current_time_desired_tz.second,
-        )
+#         # Format the time as a string (HHMMSS)
+#         time_str = "{:02d}.{:02d}.{:02d}".format(
+#             current_time_desired_tz.hour,
+#             current_time_desired_tz.minute,
+#             current_time_desired_tz.second,
+#         )
 
-        # Write the segments to the display
-        tm1637.print_to_display(time_str)
+#         # Write the segments to the display
+#         tm1637.print_to_display(time_str)
 
-        # Wait for one second before updating again
-        sleep(1 - time() % 1)  # Adjust for the time taken by the operations above
-
-
-# Usage example
-clk_pin = 9  # replace with your actual CLK pin
-dio_pin = 10  # replace with your actual DIO pin
-power_pin = 4
-tm1637 = TM1637(clk_pin, dio_pin, power_pin=power_pin)
-display_current_time(tm1637)
-# Now you can use the tm1637 object to control your display
-# segments = tm1637.encode_string("8.8.8.8.8.8.")
-# tm1637.write(segments)
-# tm1637.brightness(brightness)
-# ...
+#         # Wait for one second before updating again
+#         sleep(1 - time() % 1)  # Adjust for the time taken by the operations above
