@@ -21,7 +21,7 @@ def format_time_eight_digit_dotted(delta: datetime.timedelta) -> str:
 def format_time_six_digit_dotted(delta: datetime.timedelta) -> str:
     if delta is None:
         global SIX_DIGIT_IDLE_PHASE
-        if SIX_DIGIT_IDLE_PHASE < len(SIX_DIGIT_IDLE_FORMATS):
+        if SIX_DIGIT_IDLE_PHASE < (len(SIX_DIGIT_IDLE_FORMATS) - 1):
             SIX_DIGIT_IDLE_PHASE += 1
             return SIX_DIGIT_IDLE_FORMATS[SIX_DIGIT_IDLE_PHASE]
         else:
