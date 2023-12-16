@@ -17,7 +17,7 @@ def format_time_eight_digit_dotted(delta: datetime.timedelta) -> str:
 
 def format_time_six_digit_dotted(delta: datetime.timedelta) -> str:
     if delta is None:
-        return " . .IDLE. . "
+        return "IDLE..."
 
     hours, minutes, seconds, microseconds = get_time_components_from_delta(delta)
     return "{:02d}.{:02d}.{:02d}".format(hours, minutes, seconds)
