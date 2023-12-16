@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from time import sleep, time
+from time import sleep
 
 import wiringpi
 from wiringpi import GPIO
@@ -11,7 +10,6 @@ TM1637_CMD1 = 64  # 0x40 data command
 TM1637_CMD2 = 192  # 0xC0 address command
 TM1637_CMD3 = 128  # 0x80 display control command
 TM1637_DSP_ON = 8  # 0x08 display on
-TM1637_DELAY = 0.01  # 10us delay between clk/dio pulses
 TM1637_DELAY = 10e-6  # 10us delay between clk/dio pulses
 TM1637_MSB = 128  # msb is the decimal point or the colon depending on your display
 
@@ -139,29 +137,3 @@ class TM1637(PrintableDigitDisplay):
     def print_to_display(self, input: str) -> None:
         encoded_string = self.encode_string(input)
         self.write(encoded_string)
-
-
-# def display_current_time(tm1637):
-#     utc_offset = timedelta(hours=6)
-
-#     while True:
-#         # Get the current UTC time
-#         current_time_utc = datetime.utcnow().time()
-
-#         # Add the UTC offset to get the desired time zone (UTC+6)
-#         current_time_desired_tz = (
-#             datetime.combine(datetime.today(), current_time_utc) + utc_offset
-#         )
-
-#         # Format the time as a string (HHMMSS)
-#         time_str = "{:02d}.{:02d}.{:02d}".format(
-#             current_time_desired_tz.hour,
-#             current_time_desired_tz.minute,
-#             current_time_desired_tz.second,
-#         )
-
-#         # Write the segments to the display
-#         tm1637.print_to_display(time_str)
-
-#         # Wait for one second before updating again
-#         sleep(1 - time() % 1)  # Adjust for the time taken by the operations above
