@@ -20,7 +20,9 @@ def track_time(
         current_time = current_datetime.time()
 
         if current_time >= program["end"]:
-            if (current_datetime.weekday() + 1) in program["weekdays"]:
+            today_weekday = current_datetime.weekday()
+            tomorrow_weekday = 0 if today_weekday == 6 else today_weekday + 1
+            if tomorrow_weekday in program["weekdays"]:
                 tomorrow = datetime.date.today() + datetime.timedelta(days=1)
                 tomorrow_start_datetime = datetime.datetime.combine(
                     tomorrow, program["start"], get_target_tz()
